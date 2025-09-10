@@ -2,20 +2,8 @@ server:
   port: 8080
 
 spring:
-  application:
-    name: mybatis-basic
-  
-  # DataSource Configuration for MariaDB
-  datasource:
-    url: jdbc:mariadb://localhost:3307/goorm_mybatis
-    username: goorm-mybatis
-    password: goorm1234
-    driver-class-name: org.mariadb.jdbc.Driver
-  
-  # Flyway Configuration
-  flyway:
-    locations: classpath:db/migration/maria
-    baseline-on-migrate: true
+  profiles:
+    active:  h2  # 기본 활성 프로필 설정
   
   # Thymeleaf Configuration
   thymeleaf:
@@ -30,7 +18,6 @@ spring:
 # MyBatis Configuration
 mybatis:
   type-aliases-package: io.goorm.mybatis_basic.model
-  mapper-locations: classpath:mapper/maria/**/*.xml
   configuration:
     map-underscore-to-camel-case: true
 
