@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  flyway:
+    locations: classpath:db/migration/h2
+    baseline-on-migrate: true
+
+mybatis:
+  mapper-locations: classpath:mapper/h2/**/*.xml
+
+logging:
+  level:
+    root: INFO
+    io.goorm.mybatis_basic: DEBUG
+    io.goorm.mybatis_basic.controller: INFO
+    io.goorm.mybatis_basic.service: DEBUG
+    io.goorm.mybatis_basic.mapper: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+    com.zaxxer.hikari: INFO
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
