@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: mybatis-basic
+  
+  # DataSource Configuration for MariaDB
+  datasource:
+    url: jdbc:mariadb://localhost:3307/goorm_mybatis
+    username: goorm-mybatis
+    password: goorm1234
+    driver-class-name: org.mariadb.jdbc.Driver
+  
+  # Flyway Configuration
+  flyway:
+    locations: classpath:db/migration/maria
+    baseline-on-migrate: true
+  
+  # Thymeleaf Configuration
+  thymeleaf:
+    cache: false
+  
+  # Message Source Configuration
+  messages:
+    basename: messages.messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+
+# MyBatis Configuration
+mybatis:
+  type-aliases-package: io.goorm.mybatis_basic.model
+  mapper-locations: classpath:mapper/maria/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    io.goorm.mybatis_basic: DEBUG
+    io.goorm.mybatis_basic.controller: INFO
+    io.goorm.mybatis_basic.service: DEBUG
+    io.goorm.mybatis_basic.mapper: DEBUG
+    org.springframework.web: INFO
+    org.mybatis: DEBUG
+    com.zaxxer.hikari: INFO
+    org.flywaydb: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
