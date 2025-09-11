@@ -12,8 +12,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
-
 @Controller
 @RequiredArgsConstructor
 @Slf4j
@@ -28,20 +26,34 @@ public class PostController {
         return "index";
     }
 
-
-
-    // 게시글 목록 (페이징)
+    // 게시글 목록 (페이징 + 검색)
     @GetMapping("/posts")
     public String list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String searchType,
+            @RequestParam(required = false) String keyword,
             Model model) {
-        log.info("Accessing posts list page with page={}, size={}", page, size);
-
-        PageDto<PostListDto> pageResult = postService.findAll(page, size);
-        log.debug("Found {} posts on page {}/{}", pageResult.getContent().size(), page, pageResult.getTotalPages());
-
+        log.info("Accessing posts list page with page={}, size={}, searchType={}, keyword={}", 
+                page, size, searchType, keyword);
+        
+        PageDto<PostListDto> pageResult;
+        
+        // 검색 조건이 있으면 검색, 없으면 전체 조회
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            pageResult = postService.findAll(page, size, searchType, keyword);
+            log.debug("Found {} search results on page {}/{} for keyword: {}", 
+                    pageResult.getContent().size(), page, pageResult.getTotalPages(), keyword);
+        } else {
+            pageResult = postService.findAll(page, size);
+            log.debug("Found {} posts on page {}/{}", 
+                    pageResult.getContent().size(), page, pageResult.getTotalPages());
+        }
+        
         model.addAttribute("pageResult", pageResult);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        
         return "post/list";
     }
 

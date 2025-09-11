@@ -22,26 +22,54 @@ import java.util.stream.Collectors;
 public class PostService {
     
     private final PostMapper postMapper;
-
-
+    
     public PageDto<PostListDto> findAll(int page, int size) {
         log.debug("Finding posts with pagination: page={}, size={}", page, size);
-
+        
         // 전체 데이터 수 조회
         int totalElements = postMapper.countAll();
         log.debug("Total posts count: {}", totalElements);
-
+        
         // OFFSET 계산 (페이지는 1부터 시작)
         int offset = (page - 1) * size;
-
+        
         // 페이징된 데이터 조회
         List<Post> posts = postMapper.findAll(offset, size);
         log.debug("Found {} posts for page {}", posts.size(), page);
-
+        
         List<PostListDto> postListDtos = posts.stream()
                 .map(this::convertToListDto)
                 .collect(Collectors.toList());
-
+        
+        return PageDto.of(postListDtos, page, size, totalElements);
+    }
+    
+    public PageDto<PostListDto> findAll(int page, int size, String searchType, String keyword) {
+        log.debug("Finding posts with search: page={}, size={}, searchType={}, keyword={}", page, size, searchType, keyword);
+        
+        // 검색 조건이 없으면 기본 조회
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return findAll(page, size);
+        }
+        
+        // 검색어 전처리
+        String trimmedKeyword = keyword.trim();
+        
+        // 검색 조건에 따른 전체 데이터 수 조회
+        int totalElements = postMapper.countAllWithSearch(searchType, trimmedKeyword);
+        log.debug("Total search results count: {} for keyword: {}", totalElements, trimmedKeyword);
+        
+        // OFFSET 계산 (페이지는 1부터 시작)
+        int offset = (page - 1) * size;
+        
+        // 검색 조건에 따른 페이징된 데이터 조회
+        List<Post> posts = postMapper.findAllWithSearch(searchType, trimmedKeyword, offset, size);
+        log.debug("Found {} search results for page {}", posts.size(), page);
+        
+        List<PostListDto> postListDtos = posts.stream()
+                .map(this::convertToListDto)
+                .collect(Collectors.toList());
+        
         return PageDto.of(postListDtos, page, size, totalElements);
     }
     
