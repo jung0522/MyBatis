@@ -14,10 +14,10 @@ mybatis:
 logging:
   level:
     root: INFO
-    io.goorm.mybatis_basic: DEBUG
-    io.goorm.mybatis_basic.controller: INFO
-    io.goorm.mybatis_basic.service: DEBUG
-    io.goorm.mybatis_basic.mapper: DEBUG
+    io.goorm.mybatisboard: DEBUG
+    io.goorm.mybatisboard.controller: INFO
+    io.goorm.mybatisboard.service: DEBUG
+    io.goorm.mybatisboard.mapper: DEBUG
     org.springframework.web: INFO
     org.mybatis: DEBUG
     com.zaxxer.hikari: INFO

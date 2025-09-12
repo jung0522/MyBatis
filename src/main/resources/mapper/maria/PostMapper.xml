@@ -2,10 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="io.goorm.mybatis_basic.mapper.PostMapper">
+<mapper namespace="io.goorm.mybatisboard.mapper.PostMapper">
 
-    <select id="findAll" resultType="io.goorm.mybatis_basic.model.Post">
-        SELECT id, title, content, created_at, updated_at
+    <select id="findAll" resultType="io.goorm.mybatisboard.model.Post">
+        SELECT id, title, content, created_at, updated_at, 
+               category_id, status, author_name, view_count, is_notice
         FROM posts
         ORDER BY created_at DESC
         LIMIT #{offset}, #{size}
@@ -16,8 +17,9 @@
         FROM posts
     </select>
     
-    <select id="findAllWithSearch" resultType="io.goorm.mybatis_basic.model.Post">
-        SELECT id, title, content, created_at, updated_at
+    <select id="findAllWithSearch" resultType="io.goorm.mybatisboard.model.Post">
+        SELECT id, title, content, created_at, updated_at, 
+               category_id, status, author_name, view_count, is_notice
         FROM posts
         <where>
             <if test="keyword != null and keyword.trim() != ''">
@@ -60,22 +62,30 @@
         </where>
     </select>
 
-    <select id="findById" parameterType="long" resultType="io.goorm.mybatis_basic.model.Post">
-        SELECT id, title, content, created_at, updated_at
+    <select id="findById" parameterType="long" resultType="io.goorm.mybatisboard.model.Post">
+        SELECT id, title, content, created_at, updated_at, 
+               category_id, status, author_name, view_count, is_notice
         FROM posts
         WHERE id = #{id}
     </select>
 
-    <insert id="save" parameterType="io.goorm.mybatis_basic.model.Post" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO posts (title, content, created_at, updated_at)
-        VALUES (#{title}, #{content}, #{createdAt}, #{updatedAt})
+    <insert id="save" parameterType="io.goorm.mybatisboard.model.Post" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (title, content, created_at, updated_at, 
+                          category_id, status, author_name, view_count, is_notice)
+        VALUES (#{title}, #{content}, #{createdAt}, #{updatedAt},
+                #{categoryId}, #{status}, #{authorName}, #{viewCount}, #{isNotice})
     </insert>
 
     <update id="update">
         UPDATE posts 
         SET title = #{post.title}, 
             content = #{post.content}, 
-            updated_at = #{post.updatedAt}
+            updated_at = #{post.updatedAt},
+            category_id = #{post.categoryId},
+            status = #{post.status},
+            author_name = #{post.authorName},
+            view_count = #{post.viewCount},
+            is_notice = #{post.isNotice}
         WHERE id = #{id}
     </update>
 

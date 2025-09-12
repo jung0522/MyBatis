@@ -1,4 +1,4 @@
-package io.goorm.mybatis_basic.dto;
+package io.goorm.mybatisboard.dto;
 
 import lombok.*;
 

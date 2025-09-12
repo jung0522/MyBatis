@@ -1,4 +1,4 @@
-package io.goorm.mybatis_basic.model;
+package io.goorm.mybatisboard.model;
 
 import lombok.*;
 
@@ -16,4 +16,9 @@ public class Post {
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long categoryId;
+    private String status;
+    private String authorName;
+    private Integer viewCount;
+    private Boolean isNotice;
 }

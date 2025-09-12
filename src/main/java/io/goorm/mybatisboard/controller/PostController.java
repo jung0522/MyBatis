@@ -1,16 +1,21 @@
-package io.goorm.mybatis_basic.controller;
+package io.goorm.mybatisboard.controller;
 
-import io.goorm.mybatis_basic.dto.PageDto;
-import io.goorm.mybatis_basic.dto.PostDetailDto;
-import io.goorm.mybatis_basic.dto.PostFormDto;
-import io.goorm.mybatis_basic.dto.PostListDto;
-import io.goorm.mybatis_basic.service.PostService;
+import io.goorm.mybatisboard.dto.PageDto;
+import io.goorm.mybatisboard.dto.PostDetailDto;
+import io.goorm.mybatisboard.dto.PostFormDto;
+import io.goorm.mybatisboard.dto.PostListDto;
+import io.goorm.mybatisboard.dto.SearchConditionDto;
+import io.goorm.mybatisboard.dto.PostWithDetailsDto;
+import io.goorm.mybatisboard.dto.CategoryDto;
+import io.goorm.mybatisboard.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -34,27 +39,53 @@ public class PostController {
             @RequestParam(required = false) String searchType,
             @RequestParam(required = false) String keyword,
             Model model) {
-        log.info("Accessing posts list page with page={}, size={}, searchType={}, keyword={}", 
+        log.info("Accessing posts list page with page={}, size={}, searchType={}, keyword={}",
                 page, size, searchType, keyword);
-        
+
         PageDto<PostListDto> pageResult;
-        
+
         // 검색 조건이 있으면 검색, 없으면 전체 조회
         if (keyword != null && !keyword.trim().isEmpty()) {
             pageResult = postService.findAll(page, size, searchType, keyword);
-            log.debug("Found {} search results on page {}/{} for keyword: {}", 
+            log.debug("Found {} search results on page {}/{} for keyword: {}",
                     pageResult.getContent().size(), page, pageResult.getTotalPages(), keyword);
         } else {
             pageResult = postService.findAll(page, size);
-            log.debug("Found {} posts on page {}/{}", 
+            log.debug("Found {} posts on page {}/{}",
                     pageResult.getContent().size(), page, pageResult.getTotalPages());
         }
-        
+
+        // 검색 조건 객체 생성
+        SearchConditionDto condition = new SearchConditionDto();
+        condition.setPage(page);
+        condition.setSize(size);
+        condition.setSearchType(searchType);
+        condition.setKeyword(keyword);
+
         model.addAttribute("pageResult", pageResult);
         model.addAttribute("searchType", searchType);
         model.addAttribute("keyword", keyword);
-        
+        model.addAttribute("condition", condition);
+
         return "post/list";
+    }
+
+    // ========== 통합 검색 엔드포인트 ==========
+    @GetMapping("/posts/search")
+    public String searchWithConditions(SearchConditionDto condition, Model model) {
+        log.info("Accessing integrated search with conditions: {}", condition.getSummary());
+
+        PageDto<PostWithDetailsDto> pageResult = postService.findAllWithConditions(condition);
+        List<CategoryDto> categories = postService.findActiveCategories();
+
+        log.debug("Found {} posts on page {}/{} with conditions",
+                pageResult.getContent().size(), condition.getPage(), pageResult.getTotalPages());
+
+        model.addAttribute("pageResult", pageResult);
+        model.addAttribute("condition", condition);
+        model.addAttribute("categories", categories);
+
+        return "post/search";
     }
 
     // 게시글 상세 조회
@@ -78,10 +109,10 @@ public class PostController {
 
     // 게시글 저장 → 목록으로
     @PostMapping("/posts")
-    public String create(@ModelAttribute PostFormDto post, 
-                        RedirectAttributes redirectAttributes) {
+    public String create(@ModelAttribute PostFormDto post,
+                         RedirectAttributes redirectAttributes) {
         log.info("Creating new post with title: {}", post.getTitle());
-        
+
         postService.save(post);
         log.info("Post created successfully: {}", post.getTitle());
         redirectAttributes.addFlashAttribute("message", "flash.post.created");
@@ -93,12 +124,15 @@ public class PostController {
     public String editForm(@PathVariable Long seq, Model model) {
         log.info("Accessing edit form for post seq: {}", seq);
         PostDetailDto post = postService.findBySeq(seq);
-        
+
         // PostDetailDto를 PostFormDto로 변환
         PostFormDto formDto = new PostFormDto();
         formDto.setTitle(post.getTitle());
         formDto.setContent(post.getContent());
-        
+        formDto.setCategoryId(post.getCategoryId());
+        formDto.setAuthorName(post.getAuthorName());
+        formDto.setIsNotice(post.getIsNotice());
+
         log.debug("Loading post for edit: {}", post.getTitle());
         model.addAttribute("post", formDto);
         model.addAttribute("seq", seq);
@@ -107,11 +141,11 @@ public class PostController {
 
     // 게시글 수정 → 상세보기로
     @PostMapping("/posts/{seq}")
-    public String update(@PathVariable Long seq, 
-                        @ModelAttribute PostFormDto post, 
-                        RedirectAttributes redirectAttributes) {
+    public String update(@PathVariable Long seq,
+                         @ModelAttribute PostFormDto post,
+                         RedirectAttributes redirectAttributes) {
         log.info("Updating post seq: {} with title: {}", seq, post.getTitle());
-        
+
         postService.update(seq, post);
         log.info("Post updated successfully seq: {}", seq);
         redirectAttributes.addFlashAttribute("message", "flash.post.updated");

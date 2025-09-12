@@ -1,4 +1,4 @@
-package io.goorm.mybatis_basic.dto;
+package io.goorm.mybatisboard.dto;
 
 import lombok.*;
 
@@ -11,4 +11,7 @@ public class PostFormDto {
     
     private String title;
     private String content;
+    private Long categoryId;
+    private String authorName;
+    private Boolean isNotice;
 }
