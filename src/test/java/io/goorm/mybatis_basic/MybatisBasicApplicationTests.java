@@ -1,4 +1,4 @@
-package io.goorm.mybatis_basic;
+package io.goorm.mybatisboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

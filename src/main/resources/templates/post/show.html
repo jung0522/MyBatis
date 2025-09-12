@@ -9,9 +9,25 @@
     <div layout:fragment="content">
         <section class="max-w-3xl mx-auto px-4 py-12">
             <article class="bg-white p-6 rounded shadow">
-                <h1 th:text="${post.title}" class="text-2xl font-bold mb-2">게시글 제목</h1>
-                <div class="text-sm text-gray-500 mb-4">
-                    <span>작성일: </span><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 00:00</span>
+                <div class="mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h1 th:text="${post.title}" class="text-2xl font-bold">게시글 제목</h1>
+                        <span th:if="${post.isNotice}" 
+                              class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                            공지
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-500 space-y-1">
+                        <div>
+                            <span>작성자: </span><span th:text="${post.authorName ?: '작성자'}">작성자</span>
+                        </div>
+                        <div>
+                            <span>작성일: </span><span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 00:00</span>
+                        </div>
+                        <div>
+                            <span>조회수: </span><span th:text="${post.viewCount ?: 0}">0</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="prose max-w-none">
                     <div th:text="${post.content}" class="whitespace-pre-wrap">
